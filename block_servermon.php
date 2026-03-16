@@ -33,7 +33,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class block_servermon extends block_base {
-
     /**
      * Initialise the block title.
      *
@@ -166,7 +165,7 @@ class block_servermon extends block_base {
             return ['label' => 'Windows Server (unconfirmed)', 'reasons' => 'Non-Linux OS detected.'];
         }
 
-        // ---- Layer 1: Known platform fingerprints -------------------------
+        // Layer 1: Known platform fingerprints.
         // These give us a high-confidence environment label immediately.
         // Multiple panels can coexist so we collect all matches.
 
@@ -232,7 +231,7 @@ class block_servermon extends block_base {
             }
         }
 
-        // ---- Layer 2: Cloud provider detection ----------------------------
+        // Layer 2: Cloud provider detection.
         // Check DMI vendor strings and cloud-specific metadata paths.
 
         $cloud = '';
@@ -267,7 +266,7 @@ class block_servermon extends block_base {
             }
         }
 
-        // ---- Layer 3: Virtualisation / container type ---------------------
+        // Layer 3: Virtualisation and container type.
         // Check DMI product name and CPU flags for hypervisor hints.
 
         $virt = '';
@@ -310,7 +309,7 @@ class block_servermon extends block_base {
             }
         }
 
-        // ---- Layer 4: Bare-metal chassis detection ------------------------
+        // Layer 4: Bare-metal chassis detection.
         // DMI chassis type codes: 17=rack, 23=blade, 1=other (often bare metal).
         // Only set label here if nothing else matched — avoids overriding VPS detection.
 
@@ -331,7 +330,7 @@ class block_servermon extends block_base {
             }
         }
 
-        // ---- Layer 5: OS fingerprint --------------------------------------
+        // Layer 5: OS fingerprint.
         // Adds OS detail to signals regardless of label.
 
         if (is_readable('/etc/os-release')) {
@@ -345,7 +344,7 @@ class block_servermon extends block_base {
             $signals[] = trim(file_get_contents('/etc/redhat-release'));
         }
 
-        // ---- Layer 6: Resource-based scoring (final fallback) -------------
+        // Layer 6: Resource-based scoring (final fallback).
         // Only sets the label if nothing above produced one.
 
         $vpsscore = 0;
@@ -447,7 +446,7 @@ class block_servermon extends block_base {
         }
 
         $info = file_get_contents('/proc/meminfo');
-        preg_match('/MemTotal:\s+(\d+)\s+kB/',     $info, $mt);
+        preg_match('/MemTotal:\s+(\d+)\s+kB/', $info, $mt);
         preg_match('/MemAvailable:\s+(\d+)\s+kB/', $info, $ma);
 
         if (!$mt || !$ma) {
@@ -525,8 +524,8 @@ class block_servermon extends block_base {
     private function render_block(array $m): string {
         $togglelabel = get_string('info_toggle', 'block_servermon');
         $html  = '<div class="block-servermon">';
-        $html .= $this->render_metric_row('cpu',  $m['cpu']);
-        $html .= $this->render_metric_row('ram',  $m['ram']);
+        $html .= $this->render_metric_row('cpu', $m['cpu']);
+        $html .= $this->render_metric_row('ram', $m['ram']);
         $html .= $this->render_metric_row('disk', $m['disk']);
         $html .= '<details class="bsm-details">';
         $html .= '<summary class="bsm-summary">' . $togglelabel . '</summary>';
@@ -598,12 +597,12 @@ HTML;
     private function render_info_table(array $m): string {
         $hosting = $m['hosting'];
         $rows = [
-            get_string('uptime_label',    'block_servermon') => $m['uptime'] ?? get_string('unavailable', 'block_servermon'),
-            get_string('php_label',       'block_servermon') => htmlspecialchars($m['php']),
-            get_string('db_label',        'block_servermon') => htmlspecialchars($m['dbtype']),
-            get_string('hostname_label',  'block_servermon') => htmlspecialchars($m['hostname']),
+            get_string('uptime_label', 'block_servermon') => $m['uptime'] ?? get_string('unavailable', 'block_servermon'),
+            get_string('php_label', 'block_servermon') => htmlspecialchars($m['php']),
+            get_string('db_label', 'block_servermon') => htmlspecialchars($m['dbtype']),
+            get_string('hostname_label', 'block_servermon') => htmlspecialchars($m['hostname']),
             get_string('webserver_label', 'block_servermon') => htmlspecialchars($m['webserver']),
-            get_string('hosting_label',   'block_servermon') => htmlspecialchars($hosting['label'])
+            get_string('hosting_label', 'block_servermon') => htmlspecialchars($hosting['label'])
                 . '<br><span class="bsm-hosting-reason">' . htmlspecialchars($hosting['reasons']) . '</span>',
             get_string('timestamp_label', 'block_servermon') => htmlspecialchars($m['time']),
         ];
