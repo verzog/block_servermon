@@ -257,3 +257,33 @@
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
 }
+
+/* --- Metric log export bar --- */
+.bsm-export-bar {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.bsm-export-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #93c5fd;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.bsm-export-link:hover {
+    color: #bfdbfe;
+    text-decoration: underline;
+}
+
+.bsm-export-hint {
+    font-size: 0.7rem;
+    opacity: 0.6;
+    white-space: nowrap;
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/servermon/db" VERSION="20260320"
+       COMMENT="XMLDB file for block_servermon"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
+  <TABLES>
+    <TABLE NAME="block_servermon_log" COMMENT="Time-series server metric snapshots">
+      <FIELDS>
+        <FIELD NAME="id"          TYPE="int"    LENGTH="10" NOTNULL="true"  SEQUENCE="true"/>
+        <FIELD NAME="timecreated" TYPE="int"    LENGTH="10" NOTNULL="true"  SEQUENCE="false"/>
+        <FIELD NAME="cpu_pct"     TYPE="number" LENGTH="6"  DECIMALS="2"   NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="cpu_load1"   TYPE="number" LENGTH="8"  DECIMALS="4"   NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="ram_pct"     TYPE="number" LENGTH="6"  DECIMALS="2"   NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="ram_used"    TYPE="number" LENGTH="10" DECIMALS="4"   NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="ram_total"   TYPE="number" LENGTH="10" DECIMALS="4"   NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="disk_pct"    TYPE="number" LENGTH="6"  DECIMALS="2"   NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="disk_used"   TYPE="number" LENGTH="10" DECIMALS="4"   NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="disk_total"  TYPE="number" LENGTH="10" DECIMALS="4"   NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

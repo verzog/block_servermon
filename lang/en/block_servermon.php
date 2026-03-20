@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 // Strings are ordered alphabetically by key per Moodle coding style.
 $string['adminonly']               = 'This block is visible to site administrators only.';
+$string['log_download']            = 'Download metric log (CSV)';
+$string['log_download_hint']       = 'Up to 30 days · max 10,000 rows · 1-minute resolution';
 $string['debug_cache_app']         = 'Application cache ({$a})';
 $string['debug_cache_hits']        = 'Hits';
 $string['debug_cache_io']          = 'I/O (bytes)';

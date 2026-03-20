@@ -101,6 +101,7 @@ class block_servermon extends block_base {
         }
 
         $metrics = $this->collect_metrics();
+        $this->log_metrics($metrics);
         $this->content->text = $this->render_block($metrics);
 
         return $this->content;
@@ -129,6 +130,48 @@ class block_servermon extends block_base {
             'time'      => userdate(time()),
             'hosting'   => $this->get_hosting_type($islinux),
         ];
+    }
+
+    /**
+     * Persist a metric snapshot to the database for CSV export / trend history.
+     *
+     * Writes at most one row per minute; entries older than 30 days are pruned
+     * automatically. Silently skips when the log table does not yet exist
+     * (e.g. during a pending upgrade).
+     *
+     * @param array $metrics Metrics array from collect_metrics().
+     * @return void
+     */
+    private function log_metrics(array $metrics): void {
+        global $DB;
+
+        try {
+            // Rate-limit: skip if a row was already written in the last 60 seconds.
+            if ($DB->record_exists_select('block_servermon_log',
+                    'timecreated > :since', ['since' => time() - 60])) {
+                return;
+            }
+
+            $record              = new stdClass();
+            $record->timecreated = time();
+            $record->cpu_pct     = $metrics['cpu']['pct'];
+            $record->cpu_load1   = $metrics['cpu']['load1'];
+            $record->ram_pct     = $metrics['ram']['pct'];
+            $record->ram_used    = $metrics['ram']['used'];
+            $record->ram_total   = $metrics['ram']['total'];
+            $record->disk_pct    = $metrics['disk']['pct'];
+            $record->disk_used   = $metrics['disk']['used'];
+            $record->disk_total  = $metrics['disk']['total'];
+
+            $DB->insert_record('block_servermon_log', $record);
+
+            // Prune entries older than 30 days to keep the table bounded.
+            $DB->delete_records_select('block_servermon_log',
+                'timecreated < :cutoff', ['cutoff' => time() - (30 * DAYSECS)]);
+
+        } catch (\Throwable $e) {
+            // Never let logging break the block display.
+        }
     }
 
     /**
@@ -334,6 +377,8 @@ class block_servermon extends block_base {
      */
     private function render_block(array $m): string {
         $togglelabel = get_string('info_toggle', 'block_servermon');
+        $exporturl = new moodle_url('/blocks/servermon/export.php');
+
         $html  = '<div class="block-servermon">';
         $html .= $this->render_metric_row('cpu',  $m['cpu']);
         $html .= $this->render_metric_row('ram',  $m['ram']);
@@ -343,6 +388,14 @@ class block_servermon extends block_base {
         $html .= $this->render_info_table($m);
         $html .= '</details>';
         $html .= $this->render_debug_footer();
+        $html .= '<div class="bsm-export-bar">'
+            . '<a href="' . $exporturl->out(false) . '" class="bsm-export-link">'
+            . get_string('log_download', 'block_servermon')
+            . '</a>'
+            . '<span class="bsm-export-hint">'
+            . get_string('log_download_hint', 'block_servermon')
+            . '</span>'
+            . '</div>';
         $html .= '</div>';
         return $html;
     }
@@ -359,7 +412,10 @@ class block_servermon extends block_base {
         $label  = get_string("{$type}_label", 'block_servermon');
         $colour = $this->status_colour($pct);
         $badge  = $this->status_badge($pct);
-        $barpct = $pct !== null ? min($pct, 100) : 0;
+        // Bar and display text are capped at 100 — CPU load avg can exceed 100% on overloaded
+        // systems and that value is more usefully shown in the load-average detail line below.
+        $barpct      = $pct !== null ? min($pct, 100) : 0;
+        $displaypct  = $pct !== null ? min($pct, 100.0) : null;
 
         // Build detail line.
         $detail = '';
@@ -381,8 +437,8 @@ class block_servermon extends block_base {
             ? '<div class="bsm-unavail">' . get_string('unavailable', 'block_servermon') . '</div>'
             : '';
 
-        $valuedisplay = $pct !== null
-            ? '<span class="bsm-pct">' . $pct . '%</span>'
+        $valuedisplay = $displaypct !== null
+            ? '<span class="bsm-pct">' . $displaypct . '%</span>'
             : '';
 
         $html  = '<div class="bsm-row">';
