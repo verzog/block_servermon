@@ -15,32 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy provider for block_servermon.
- *
- * This block stores no personal data whatsoever.
+ * Scheduled task definitions for block_servermon.
  *
  * @package   block_servermon
  * @copyright 2026 Vernon Spain
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace block_servermon\privacy;
 
-use core_privacy\local\metadata\null_provider;
+defined('MOODLE_INTERNAL') || die();
 
-/**
- * Privacy provider declaring that this block stores no personal data.
- *
- * @package   block_servermon
- * @copyright 2026 Vernon Spain
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-class provider implements null_provider {
-    /**
-     * Returns the language string key explaining why no data is stored.
-     *
-     * @return string
-     */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
-    }
-}
+$tasks = [
+    [
+        'classname' => 'block_servermon\task\collect_metrics',
+        'blocking'  => 0,
+        'minute'    => '*/5',
+        'hour'      => '*',
+        'day'       => '*',
+        'month'     => '*',
+        'dayofweek' => '*',
+        'disabled'  => 0,
+    ],
+];
