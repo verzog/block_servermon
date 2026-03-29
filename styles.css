@@ -77,10 +77,21 @@
     transition: width 0.3s ease;
 }
 
-.bsm-bar-fill.bsm-ok       { background-color: #2ecc71; }
-.bsm-bar-fill.bsm-moderate { background-color: #f39c12; }
-.bsm-bar-fill.bsm-high     { background-color: #e74c3c; }
-.bsm-bar-fill.bsm-unknown  { background-color: #95a5a6; }
+.bsm-bar-fill.bsm-ok {
+    background-color: #2ecc71;
+}
+
+.bsm-bar-fill.bsm-moderate {
+    background-color: #f39c12;
+}
+
+.bsm-bar-fill.bsm-high {
+    background-color: #e74c3c;
+}
+
+.bsm-bar-fill.bsm-unknown {
+    background-color: #95a5a6;
+}
 
 /* --- Badges --- */
 .bsm-unavail {
@@ -99,10 +110,21 @@
     border-radius: 2px;
 }
 
-.bsm-badge.bsm-ok       { color: #27ae60; }
-.bsm-badge.bsm-moderate { color: #d68910; }
-.bsm-badge.bsm-high     { color: #c0392b; }
-.bsm-badge.bsm-unknown  { color: #7f8c8d; }
+.bsm-badge.bsm-ok {
+    color: #27ae60;
+}
+
+.bsm-badge.bsm-moderate {
+    color: #d68910;
+}
+
+.bsm-badge.bsm-high {
+    color: #c0392b;
+}
+
+.bsm-badge.bsm-unknown {
+    color: #7f8c8d;
+}
 
 /* --- Collapsible info section --- */
 .bsm-details {
@@ -273,4 +295,60 @@
     font-weight: 600;
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
+}
+
+/* --- Per-core CPU breakdown --- */
+
+.bsm-percore {
+    margin-top: 0.45rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.12);
+}
+
+.bsm-percore-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+}
+
+.bsm-percore-label {
+    font-size: 0.68rem;
+    opacity: 0.55;
+    width: 2.8rem;
+    flex-shrink: 0;
+}
+
+.bsm-percore-track {
+    flex: 1;
+    height: 4px;
+    margin: 0;
+}
+
+.bsm-percore-pct {
+    font-size: 0.68rem;
+    font-weight: 600;
+    width: 2.4rem;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* --- CSV export link --- */
+
+.bsm-csv-link {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(128, 128, 128, 0.12);
+    text-align: center;
+}
+
+.bsm-csv-link a {
+    font-size: 0.72rem;
+    opacity: 0.6;
+    text-decoration: none;
+}
+
+.bsm-csv-link a:hover {
+    opacity: 1;
+    text-decoration: underline;
 }

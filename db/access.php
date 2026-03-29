@@ -21,11 +21,9 @@
  * @copyright 2026 Vernon Spain
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-
     // Allows adding this block to any page (site/course contexts).
     'block/servermon:addinstance' => [
         'riskbitmask'  => RISK_CONFIG,
@@ -35,7 +33,6 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
-
     // Allows adding this block to a user's own Dashboard (My page).
     'block/servermon:myaddinstance' => [
         'riskbitmask'  => RISK_CONFIG,
@@ -45,5 +42,4 @@ $capabilities = [
             'manager' => CAP_ALLOW,
         ],
     ],
-
 ];
