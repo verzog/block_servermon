@@ -15,16 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details for block_servermon.
+ * Admin settings for block_servermon.
  *
  * @package   block_servermon
  * @copyright 2026 Vernon Spain
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'block_servermon';
-$plugin->version   = 2026040100;
-$plugin->requires  = 2024100700; // Moodle 5.0 minimum.
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.2.0';
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configtext(
+        'block_servermon/disk_path',
+        get_string('setting_disk_path', 'block_servermon'),
+        get_string('setting_disk_path_desc', 'block_servermon'),
+        '/',
+        PARAM_PATH
+    ));
+}
