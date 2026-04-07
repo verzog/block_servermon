@@ -78,9 +78,9 @@ function bsm_get_processes_via_proc(): array {
             $hz = $ticks;
         }
     }
-    $elapsedTicks = 0.2 * $hz;
+    $elapsedticks = 0.2 * $hz;
 
-    $memTotalKb = bsm_read_mem_total_kb();
+    $memtotalkb = bsm_read_mem_total_kb();
 
     $processes = [];
     foreach ($snap2 as $pid => $s2) {
@@ -89,18 +89,18 @@ function bsm_get_processes_via_proc(): array {
         }
         $s1     = $snap1[$pid];
         $delta  = $s2['cpu_ticks'] - $s1['cpu_ticks'];
-        $cpuPct = $elapsedTicks > 0 ? round(($delta / $elapsedTicks) * 100, 1) : 0.0;
-        $memPct = $memTotalKb > 0 ? round(($s2['rss_kb'] / $memTotalKb) * 100, 1) : 0.0;
+        $cpupct = $elapsedticks > 0 ? round(($delta / $elapsedticks) * 100, 1) : 0.0;
+        $mempct = $memtotalkb > 0 ? round(($s2['rss_kb'] / $memtotalkb) * 100, 1) : 0.0;
 
         $processes[] = [
             'pid'     => (int) $pid,
             'name'    => $s2['name'],
-            'cpu_pct' => max(0.0, $cpuPct),
-            'mem_pct' => $memPct,
+            'cpu_pct' => max(0.0, $cpupct),
+            'mem_pct' => $mempct,
         ];
     }
 
-    usort($processes, function($a, $b) {
+    usort($processes, function ($a, $b) {
         return $b['cpu_pct'] <=> $a['cpu_pct'];
     });
 
@@ -134,10 +134,9 @@ function bsm_scan_proc_stats(): array {
             continue;
         }
 
-        // /proc/[pid]/stat format:
-        // pid (comm) state ppid pgrp session tty_nr tpgid flags minflt cminflt majflt cmajflt utime stime ...
+        // Format: pid (comm) state ppid pgrp session tty_nr tpgid flags minflt cminflt majflt cmajflt utime stime ...
         // The comm field is wrapped in () and may contain spaces but not ')'.
-        // utime = field index 13, stime = field index 14 (0-based).
+        // Utime = field index 13, stime = field index 14 (0-based).
         if (!preg_match('/^(\d+)\s+\((.+)\)\s+\S+(?:\s+\S+){10}\s+(\d+)\s+(\d+)/', $stat, $m)) {
             continue;
         }
@@ -146,12 +145,12 @@ function bsm_scan_proc_stats(): array {
         $stime = (int) $m[4];
 
         // RSS from /proc/[pid]/status (VmRSS line).
-        $rssKb      = 0;
+        $rsskb      = 0;
         $statusfile = $dir . '/status';
         if (is_readable($statusfile)) {
             $status = @file_get_contents($statusfile);
             if ($status && preg_match('/^VmRSS:\s+(\d+)\s+kB/im', $status, $rm)) {
-                $rssKb = (int) $rm[1];
+                $rsskb = (int) $rm[1];
             }
         }
 
@@ -199,7 +198,7 @@ function bsm_get_processes_via_ps(): array {
         return [];
     }
 
-    // --sort=-%cpu to get highest-CPU processes first; limit to 6 lines to get 5 processes.
+    // Sort by CPU descending; limit to 6 lines to capture 5 processes.
     $out = @shell_exec('ps aux --no-headers --sort=-%cpu 2>/dev/null | head -6');
     if (!$out || strlen(trim($out)) === 0) {
         return [];
@@ -208,7 +207,7 @@ function bsm_get_processes_via_ps(): array {
     $lines     = array_filter(explode("\n", trim($out)));
     $processes = [];
     foreach (array_values($lines) as $line) {
-        // ps aux columns: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND
+        // Columns: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND.
         $parts = preg_split('/\s+/', trim($line), 11);
         if (count($parts) < 11) {
             continue;
