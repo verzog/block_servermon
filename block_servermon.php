@@ -609,8 +609,6 @@ class block_servermon extends block_base {
      * @return string HTML output.
      */
     private function render_process_section(): string {
-        global $PAGE;
-
         $instanceid = $this->instance->id;
         $url        = (new \moodle_url('/blocks/servermon/process.php'))->out(false);
         $label      = get_string('proc_toggle', 'block_servermon');
@@ -701,7 +699,7 @@ class block_servermon extends block_base {
 })();
 JSEOF;
         // phpcs:enable
-        $PAGE->requires->js_init_code($js, true);
+        $this->page->requires->js_init_code($js, true);
 
         $containerid = 'bsm-proctable-' . $instanceid;
         $detailsid   = 'bsm-proc-details-' . $instanceid;
