@@ -9,7 +9,7 @@
 </ul>
 
 <h4>Top processes by CPU</h4>
-<p>A collapsible panel that polls the server every 5 seconds via AJAX while open and stops when collapsed. Displays PID, process name, CPU%, and MEM% for the top 5 processes. Reads <code>/proc/[pid]/stat</code> directly with a 200 ms sample window; falls back to <code>ps aux</code> if <code>/proc</code> is unavailable.</p>
+<p>A collapsible panel that polls the server every 5 seconds via AJAX while open and stops when collapsed. Displays PID, process name, CPU%, MEM%, and the last CPU core the process ran on for the top 5 processes. Reads <code>/proc/[pid]/stat</code> directly with a 200 ms sample window; falls back to <code>ps -A --sort=-%cpu -o pid,pcpu,pmem,psr,comm</code> if <code>/proc</code> is unavailable. The Core column lets you cross-reference a saturated core in the per-core CPU bars with the process responsible.</p>
 
 <h4>Moodle debug footer — key metrics</h4>
 <p>A collapsible panel showing Moodle page-performance data for the current request:</p>

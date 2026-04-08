@@ -619,6 +619,7 @@ class block_servermon extends block_base {
         $hname      = get_string('proc_name', 'block_servermon');
         $hcpu       = get_string('proc_cpu', 'block_servermon');
         $hmem       = get_string('proc_mem', 'block_servermon');
+        $hcore      = get_string('proc_core', 'block_servermon');
 
         // Inline JS is intentionally narrow: read-only AJAX poll, no user input.
         // phpcs:disable moodle.Files.InlineJavaScript.Found
@@ -633,6 +634,7 @@ class block_servermon extends block_base {
     var hName   = {$this->js_string($hname)};
     var hCpu    = {$this->js_string($hcpu)};
     var hMem    = {$this->js_string($hmem)};
+    var hCore   = {$this->js_string($hcore)};
     var el, details, timer;
 
     function esc(s) {
@@ -653,13 +655,17 @@ class block_servermon extends block_base {
             + '<th class="bsm-proc-name">' + hName + '</th>'
             + '<th class="bsm-proc-num">'  + hCpu  + '</th>'
             + '<th class="bsm-proc-num">'  + hMem  + '</th>'
+            + '<th class="bsm-proc-core">' + hCore + '</th>'
             + '</tr></thead><tbody>';
         data.processes.forEach(function(p) {
+            var core = (p.cpu_core !== null && p.cpu_core !== undefined)
+                ? esc(p.cpu_core) : '\u2014';
             html += '<tr>'
                 + '<td class="bsm-proc-pid">'  + esc(p.pid)     + '</td>'
                 + '<td class="bsm-proc-name">' + esc(p.name)    + '</td>'
                 + '<td class="bsm-proc-num">'  + esc(p.cpu_pct) + '%</td>'
                 + '<td class="bsm-proc-num">'  + esc(p.mem_pct) + '%</td>'
+                + '<td class="bsm-proc-core">' + core           + '</td>'
                 + '</tr>';
         });
         html += '</tbody></table>';
