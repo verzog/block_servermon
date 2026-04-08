@@ -57,6 +57,7 @@ $string['load_averages']           = '1m: {$a->one} · 5m: {$a->five} · 15m: {$
 $string['os_label']                = 'Operating System';
 $string['php_label']               = 'PHP Version';
 $string['pluginname']              = 'Server Monitor';
+$string['proc_core']               = 'Core';
 $string['proc_cpu']                = 'CPU%';
 $string['proc_empty']              = 'No process data available.';
 $string['proc_error']              = 'Unable to load process data.';

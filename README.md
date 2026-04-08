@@ -59,10 +59,13 @@ Once open, the panel polls the server every **5 seconds** via a lightweight AJAX
 | **Process** | Command name (truncated to 15 chars by the kernel) |
 | **CPU%** | CPU usage over the last ~200 ms sample window |
 | **MEM%** | Resident set size as a percentage of total RAM |
+| **Core** | Last CPU core the process ran on (0-indexed). Useful for correlating a saturated core in the per-core bars above with the process responsible. Shows `—` if unavailable. |
 
 The poll stops automatically when you collapse the panel to avoid unnecessary background requests.
 
-**How it works:** The AJAX endpoint (`process.php`) reads all `/proc/[pid]/stat` files twice with a 200 ms gap and calculates per-process CPU% from the tick delta, mirroring what `ps` does internally. On servers where `/proc` is unavailable, it falls back to `ps aux --sort=-%cpu` via `shell_exec()` if that function is permitted.
+**How it works:** The AJAX endpoint (`process.php`) reads all `/proc/[pid]/stat` files twice with a 200 ms gap and calculates per-process CPU% from the tick delta, mirroring what `ps` does internally. The last-used CPU core is read from field 38 of `/proc/[pid]/stat`. On servers where `/proc` is unavailable, it falls back to `ps -A --sort=-%cpu -o pid,pcpu,pmem,psr,comm` via `shell_exec()` if that function is permitted.
+
+> **Note on Core column accuracy:** The Linux scheduler migrates processes between cores freely. The value shown is the core the process was last seen on at the moment of the second `/proc` snapshot. For a process that is pinning a core solid, this will be consistent. For lightly loaded processes that bounce around, the value may change on each refresh — this is accurate behaviour.
 
 ---
 

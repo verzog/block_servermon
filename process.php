@@ -41,7 +41,7 @@ echo json_encode(['processes' => bsm_get_top_processes()]);
  *
  * Tries /proc sampling first (Linux), then falls back to ps(1).
  *
- * @return array Array of process records: pid, name, cpu_pct, mem_pct.
+ * @return array Array of process records: pid, name, cpu_pct, mem_pct, cpu_core.
  */
 function bsm_get_top_processes(): array {
     $islinux = (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN');
@@ -59,7 +59,7 @@ function bsm_get_top_processes(): array {
 /**
  * Sample /proc/[pid]/stat twice (200 ms apart) and derive per-process CPU%.
  *
- * @return array Top-5 process records, sorted by cpu_pct descending.
+ * @return array Top-5 process records, sorted by cpu_pct descending, with cpu_core.
  */
 function bsm_get_processes_via_proc(): array {
     $snap1 = bsm_scan_proc_stats();
@@ -93,10 +93,11 @@ function bsm_get_processes_via_proc(): array {
         $mempct = $memtotalkb > 0 ? round(($s2['rss_kb'] / $memtotalkb) * 100, 1) : 0.0;
 
         $processes[] = [
-            'pid'     => (int) $pid,
-            'name'    => $s2['name'],
-            'cpu_pct' => max(0.0, $cpupct),
-            'mem_pct' => $mempct,
+            'pid'      => (int) $pid,
+            'name'     => $s2['name'],
+            'cpu_pct'  => max(0.0, $cpupct),
+            'mem_pct'  => $mempct,
+            'cpu_core' => $s2['cpu_core'],
         ];
     }
 
@@ -110,7 +111,8 @@ function bsm_get_processes_via_proc(): array {
 /**
  * Read all readable /proc/[pid]/stat entries and return an array keyed by PID.
  *
- * Each value contains: name (string), cpu_ticks (int), rss_kb (int).
+ * Each value contains: name (string), cpu_ticks (int), rss_kb (int), cpu_core (int|null).
+ * cpu_core is the last CPU the process ran on (field 38, 0-based, Linux 2.2.8+).
  *
  * @return array
  */
@@ -144,6 +146,15 @@ function bsm_scan_proc_stats(): array {
         $utime = (int) $m[3];
         $stime = (int) $m[4];
 
+        // Processor field (field 38, 0-based): split after the closing ')' and read index 36.
+        // State is index 0 in that split; processor is 36 fields later.
+        $cpucore = null;
+        $rest    = substr($stat, (int) strrpos($stat, ')') + 1);
+        $fields  = preg_split('/\s+/', trim($rest));
+        if (isset($fields[36]) && ctype_digit((string) $fields[36])) {
+            $cpucore = (int) $fields[36];
+        }
+
         // RSS from /proc/[pid]/status (VmRSS line).
         $rsskb      = 0;
         $statusfile = $dir . '/status';
@@ -158,6 +169,7 @@ function bsm_scan_proc_stats(): array {
             'name'      => $m[2],
             'cpu_ticks' => $utime + $stime,
             'rss_kb'    => $rsskb,
+            'cpu_core'  => $cpucore,
         ];
     }
 
@@ -199,7 +211,7 @@ function bsm_get_processes_via_ps(): array {
     }
 
     // Sort by CPU descending; limit to 6 lines to capture 5 processes.
-    $out = @shell_exec('ps aux --no-headers --sort=-%cpu 2>/dev/null | head -6');
+    $out = @shell_exec('ps -A --no-headers --sort=-%cpu -o pid,pcpu,pmem,psr,comm 2>/dev/null | head -6');
     if (!$out || strlen(trim($out)) === 0) {
         return [];
     }
@@ -207,16 +219,17 @@ function bsm_get_processes_via_ps(): array {
     $lines     = array_filter(explode("\n", trim($out)));
     $processes = [];
     foreach (array_values($lines) as $line) {
-        // Columns: USER PID %CPU %MEM VSZ RSS TTY STAT START TIME COMMAND.
-        $parts = preg_split('/\s+/', trim($line), 11);
-        if (count($parts) < 11) {
+        // Columns: PID %CPU %MEM PSR COMMAND (sorted by CPU descending).
+        $parts = preg_split('/\s+/', trim($line), 5);
+        if (count($parts) < 5) {
             continue;
         }
         $processes[] = [
-            'pid'     => (int) $parts[1],
-            'name'    => basename(strtok($parts[10], ' ')),
-            'cpu_pct' => (float) $parts[2],
-            'mem_pct' => (float) $parts[3],
+            'pid'      => (int) $parts[0],
+            'name'     => $parts[4],
+            'cpu_pct'  => (float) $parts[1],
+            'mem_pct'  => (float) $parts[2],
+            'cpu_core' => ctype_digit((string) $parts[3]) ? (int) $parts[3] : null,
         ];
         if (count($processes) >= 5) {
             break;
