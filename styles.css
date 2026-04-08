@@ -95,7 +95,7 @@
 
 /* --- Badges --- */
 .bsm-unavail {
-    font-size: 0.73rem;
+    font-size: 0.72rem;
     opacity: 0.5;
     font-style: italic;
 }
@@ -181,7 +181,7 @@
 }
 
 .bsm-hosting-reasons {
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     opacity: 0.6;
     font-style: italic;
 }
@@ -191,7 +191,6 @@
 .bsm-summary-debug {
     font-size: 0.82rem;
     font-weight: 700;
-    opacity: 1;
 }
 
 .bsm-debug-body {
@@ -217,7 +216,7 @@
 }
 
 .bsm-metric-label {
-    font-size: 0.67rem;
+    font-size: 0.68rem;
     opacity: 0.8;
     margin-bottom: 0.15rem;
     white-space: nowrap;
@@ -233,7 +232,7 @@
 
 /* Section headings */
 .bsm-debug-section-title {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 700;
     margin: 0.85rem 0 0.3rem;
 }
@@ -259,7 +258,7 @@
 /* Cache store rows */
 .bsm-cache-header {
     display: flex;
-    font-size: 0.71rem;
+    font-size: 0.72rem;
     font-weight: 600;
     opacity: 0.6;
     padding: 0.15rem 0.6rem;
@@ -271,7 +270,7 @@
     align-items: center;
     font-size: 0.75rem;
     padding: 0.4rem 0.6rem;
-    border-radius: 0.3rem;
+    border-radius: 0.375rem;
     margin-bottom: 0.2rem;
     background: rgba(128, 128, 128, 0.12);
 }
@@ -355,7 +354,7 @@
 }
 
 .bsm-proc-table thead tr {
-    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.12);
 }
 
 .bsm-proc-table th {
@@ -363,7 +362,6 @@
     font-weight: 600;
     opacity: 0.55;
     padding: 0.2rem 0.3rem;
-    text-align: left;
 }
 
 .bsm-proc-table td {
